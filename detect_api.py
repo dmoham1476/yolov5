@@ -23,8 +23,8 @@ model = attempt_load(weights, map_location=device)  # load FP32 model
 def detect():
     save_img=False
     form_data = request.json
-    print(form_data)
-
+    source_type = form_data["source_type"]
+    np_list = form_data["numpy_list"]
     source = form_data['source']
     out = form_data['output']
     imgsz = form_data['imgsz']
@@ -37,9 +37,7 @@ def detect():
     augment = form_data['augment']
     update = form_data['update']
 
-
     webcam = source == '0' or source.startswith('rtsp') or source.startswith('http')
-    print("Testing.......", webcam)
     # Initialize
     # device = torch_utils.select_device(opt.device)
     if os.path.exists(out):
@@ -68,7 +66,7 @@ def detect():
         dataset = LoadStreams(source, img_size=imgsz)
     else:
         save_img = True
-        dataset = LoadImages(source, img_size=imgsz)
+        dataset = LoadImages(source_type, np_list, source, img_size=imgsz)
 
     # Get names and colors
     names = model.module.names if hasattr(model, 'module') else model.names
@@ -110,7 +108,6 @@ def detect():
                 p, s, im0 = path[i], '%g: ' % i, im0s[i].copy()
             else:
                 p, s, im0 = path, '', im0s
-
             save_path = str(Path(out) / Path(p).name)
             txt_path = str(Path(out) / Path(p).stem) + ('_%g' % dataset.frame if dataset.mode == 'video' else '')
             s += '%gx%g ' % img.shape[2:]  # print string
@@ -147,8 +144,8 @@ def detect():
             # Save results (image with detections)
             if save_img:
                 if dataset.mode == 'images':
-                    print("Testing.....")
-                    cv2.imwrite(save_path, im0)
+                    print("Testing.......", save_path)
+                    cv2.imwrite(save_path + '.jpg', im0)
 #                else:
 #                    if vid_path != save_path:  # new video
 #                        vid_path = save_path

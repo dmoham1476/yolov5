@@ -13,6 +13,7 @@ from pathlib import Path
 from threading import Thread
 
 import cv2
+import base64
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -120,7 +121,7 @@ class _RepeatSampler(object):
 
 
 class LoadImages:  # for inference
-    def __init__(self, path, img_size=640, stride=32):
+    def __init__(self, source_type, np_list, path, img_size=640, stride=32):
         p = str(Path(path).absolute())  # os-agnostic absolute path
         if '*' in p:
             files = sorted(glob.glob(p, recursive=True))  # glob
@@ -131,13 +132,19 @@ class LoadImages:  # for inference
         else:
             raise Exception(f'ERROR: {p} does not exist')
 
-        images = [x for x in files if x.split('.')[-1].lower() in img_formats]
+        if source_type == 'numpy_list':
+            images = np_list
+        else:
+            images = [x for x in files if x.split('.')[-1].lower() in img_formats]
         videos = [x for x in files if x.split('.')[-1].lower() in vid_formats]
         ni, nv = len(images), len(videos)
 
         self.img_size = img_size
         self.stride = stride
         self.files = images + videos
+        self.files_list = ['output' + str(x) for x in range(len(np_list))]
+        self.np_list = np_list
+        self.source_type = source_type
         self.nf = ni + nv  # number of files
         self.video_flag = [False] * ni + [True] * nv
         self.mode = 'image'
@@ -156,7 +163,7 @@ class LoadImages:  # for inference
         if self.count == self.nf:
             raise StopIteration
         path = self.files[self.count]
-
+        path2 = self.files_list[self.count] 
         if self.video_flag[self.count]:
             # Read video
             self.mode = 'video'
@@ -177,9 +184,15 @@ class LoadImages:  # for inference
         else:
             # Read image
             self.count += 1
-            img0 = cv2.imread(path)  # BGR
+            if not self.source_type == 'numpy_list':
+                img0 = cv2.imread(path)  # BGR
+                path_list.append(self.count)
+            else:
+                jpg_original = base64.b64decode(path)
+                jpg_as_np = np.frombuffer(jpg_original, dtype=np.uint8)
+                img0 = cv2.imdecode(jpg_as_np, flags=1)
             assert img0 is not None, 'Image Not Found ' + path
-            print(f'image {self.count}/{self.nf} {path}: ', end='')
+            print(f'image {self.count}/{self.nf} {path2}: ', end='')
 
         # Padded resize
         img = letterbox(img0, self.img_size, stride=self.stride)[0]
@@ -187,8 +200,7 @@ class LoadImages:  # for inference
         # Convert
         img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
         img = np.ascontiguousarray(img)
-
-        return path, img, img0, self.cap
+        return path2, img, img0, self.cap
 
     def new_video(self, path):
         self.frame = 0
