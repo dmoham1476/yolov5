@@ -11,7 +11,7 @@ git clone https://gecgithub01.walmart.com/d0m028p/gulfstream_yolov5.git
 Step 3: Install dependancies\
 apt update\
 apt-get install python3-pip\
-pip3 install nano\
+apt-get install nano\
 nano requirements.txt\
 #Comment out torch, torchvision, opencv-python in requirements.txt\
 #Ctrl-O and then Ctrl-X in nano editor\
