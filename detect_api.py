@@ -8,6 +8,7 @@ from utils.datasets import *
 from utils.torch_utils import *
 from utils.general import check_img_size, non_max_suppression, scale_coords
 from utils.plots import plot_one_box
+from itemId import *
 
 import sys
 
@@ -120,7 +121,8 @@ def detect():
                 for c in det[:, -1].unique():
                     n = (det[:, -1] == c).sum()  # detections per class
                     s += '%g %ss, ' % (n, names[int(c)])  # add to string
-                    results[path][names[int(c)]] = n.item()
+                    results[path][label_to_itemId_map[names[int(c)]]] = n.item()
+                    
                 # Write results
                 for *xyxy, conf, cls in det:
                     if save_txt:  # Write to file
