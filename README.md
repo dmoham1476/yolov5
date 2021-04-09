@@ -16,7 +16,7 @@ nano requirements.txt\
 #Comment out torch, torchvision, opencv-python in requirements.txt\
 #Ctrl-O and then Ctrl-X in nano editor\
 pip3 install -r requirements.txt\
-apt install -y python3-opencv\
+apt install -y python3-opencv
 
 Step 4: Download trained model weights\
 #Download/copy the yolov5 trained model into the repo\
