@@ -12,7 +12,9 @@ Step 3: Install dependancies\
 apt update\
 apt-get install python3-pip\
 pip3 install nano\
+nano requirements.txt\
 #Comment out torch, torchvision, opencv-python in requirements.txt\
+#Ctrl-O and then Ctrl-X in nano editor\
 pip3 install -r requirements.txt\
 apt install -y python3-opencv\
 
