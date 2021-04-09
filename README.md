@@ -18,8 +18,5 @@ nano requirements.txt\
 pip3 install -r requirements.txt\
 apt install -y python3-opencv
 
-Step 4: Download trained model weights\
-#Download/copy the yolov5 trained model into the repo
-
-Step 5: Start the yolov5 model server\
-python3 detect_api.py <path_to_model>
+Step 4: Start the yolov5 model server\
+python3 detect_api.py ./yolov5_0330_best.pt
