@@ -17,6 +17,7 @@ nano requirements.txt\
 #Ctrl-O and then Ctrl-X in nano editor\
 pip3 install -r requirements.txt\
 apt install -y python3-opencv
+pip install flask
 
 Step 4: Start the yolov5 model server\
 python3 detect_api.py ./yolov5_0330_best.pt
