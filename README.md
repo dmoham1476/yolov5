@@ -7,7 +7,7 @@ docker run -it --runtime nvidia --net host -e DISPLAY=:0 -v /tmp/.X11-unix:/tmp/
 
 Step 2:Clone the git repo\
 git clone https://gecgithub01.walmart.com/d0m028p/gulfstream_yolov5.git \
-cd gulfstream_yolov5\
+cd gulfstream_yolov5
 
 Step 3: Install dependancies\
 apt update\
