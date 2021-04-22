@@ -9,6 +9,7 @@ from utils.torch_utils import *
 from utils.general import check_img_size, non_max_suppression, scale_coords
 from utils.plots import plot_one_box
 from itemId import *
+from collections import defaultdict
 
 import sys
 
@@ -19,6 +20,21 @@ device_number = '' if len(sys.argv) <=2  else sys.argv[2]
 device = select_device(device_number)
 
 model = attempt_load(weights, map_location=device)  # load FP32 model
+
+def consolidate(results):
+    agg_list = []
+    for cam, predict in results.items():
+        agg_list.append(predict)
+
+    union_results = defaultdict(set)
+    #Aggregate all camera predictions
+    for d in agg_list:
+       	for k,v in d.items():
+            union_results[k].add(v)
+    #Assuming no false positives, keep maximum of all counts detected by each camera for an item
+    max_dict = {label_to_itemId_map[k] : max(union_results[k]) for k in union_results}
+
+    return max_dict
 
 @app.route('/detect', methods=['GET', 'POST'])
 def detect():
@@ -121,8 +137,8 @@ def detect():
                 for c in det[:, -1].unique():
                     n = (det[:, -1] == c).sum()  # detections per class
                     s += '%g %ss, ' % (n, names[int(c)])  # add to string
-                    results[path][label_to_itemId_map[names[int(c)]]] = n.item()
-                    
+                    #results[path][label_to_itemId_map[names[int(c)]]] = n.item()
+                    results[path][names[int(c)]] = n.item()
                 # Write results
                 for *xyxy, conf, cls in det:
                     if save_txt:  # Write to file
@@ -168,7 +184,7 @@ def detect():
 
     print('Done. (%.3fs)' % (time.time() - t0))
 
-    return jsonify(results)
+    return jsonify(consolidate(results))
 
 
 if __name__ == '__main__':
