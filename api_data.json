@@ -1,7 +1,7 @@
 {
     "source" : "data/images",
     "output" : "data/output",
-    "numpy_list" : [],
+    "image_list" : [],
     "imgsz" : 640,
     "conf_thres" : 0.4,
     "iou_thres" : 0.5,

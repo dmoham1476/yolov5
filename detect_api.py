@@ -41,7 +41,7 @@ def detect():
     save_img=False
     form_data = request.json
     source_type = form_data["source_type"]
-    np_list = form_data["numpy_list"]
+    #np_list = form_data["numpy_list"]
     source = form_data['source']
     out = form_data['output']
     imgsz = form_data['imgsz']
@@ -53,6 +53,11 @@ def detect():
     agnostic_nms = form_data['agnostic_nms']
     augment = form_data['augment']
     update = form_data['update']
+    np_list = []
+    #Camera specific metadata in the client api
+    img_metadata  = form_data["image_list"]
+    for img_table in img_metadata:
+        np_list.append(img_table["numpy_list"][0])
 
     webcam = source == '0' or source.startswith('rtsp') or source.startswith('http')
     # Initialize
