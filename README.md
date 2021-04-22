@@ -21,7 +21,7 @@ apt install -y python3-opencv\
 pip3 install flask
 
 Step 4: Start the yolov5 model server\
-python3 detect_api.py ./yolov5_0330_best.pt
+python3 detect_api.py ./MODEL_DIR/yolov5m_0418.pt
 
 ## Option 2 : Steps to bring up model server on NX using build from source without ngc container
 sudo apt-get install python3-pip git\
@@ -45,4 +45,4 @@ cd gulfstream_yolov5\
 sudo pip3 install -U pip testresources\
 pip3 install -r requirements.txt
 Start the yolov5 model server\
-python3 detect_api.py ./yolov5_0330_best.pt
+python3 detect_api.py ./MODEL_DIR/yolov5m_0418.pt
