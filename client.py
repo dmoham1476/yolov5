@@ -34,4 +34,14 @@ data["image_list"] = img_list
 #print(data)
 
 server_return = requests.post(url, json=data)
-print(server_return.text)
+server_return = server_return.json()
+
+print(server_return["detected_items"])
+jpg_original = base64.b64decode(server_return["undetected_item"])
+jpg_as_np = np.frombuffer(jpg_original, dtype=np.uint8)
+img0 = cv2.imdecode(jpg_as_np, flags=1)
+
+cv2.imwrite('color_img.jpg', img0)
+cv2.imshow('Color image', img0)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
