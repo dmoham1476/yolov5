@@ -149,7 +149,7 @@ def detect(save_img=False):
 
             # Write results
             covered_img = im0
-            
+
             if len(det):
                 # Rescale boxes from img_size to im0 size
                 det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
@@ -182,10 +182,7 @@ def detect(save_img=False):
             # Print time (inference + NMS)
             print(f'{s}Done. ({t2 - t1:.3f}s)')
 
-            # Stream results
-            if view_img:
-                cv2.namedWindow(str(p), cv2.WINDOW_NORMAL)
-                cv2.imshow(str(p), im0)
+
 
 
             # Remove background with 1m away
@@ -220,9 +217,14 @@ def detect(save_img=False):
         s = f"\n{len(list(save_dir.glob('labels/*.txt')))} labels saved to {save_dir / 'labels'}" if save_txt else ''
         print(f"Results saved to {save_dir}{s}")
     """
+
+    # Stream results
+    if view_img:
+        cv2.namedWindow(str(p), cv2.WINDOW_NORMAL)
+        cv2.imshow(str(p), bg_removed)
     print(type(bg_removed))
     print(f'Done. ({time.time() - t0:.3f}s)')
-
+    return jsonify(bg_removed)
 
 
 if __name__ == '__main__':
