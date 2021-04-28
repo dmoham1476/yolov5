@@ -10,7 +10,7 @@ with open(json_file) as f:
     data = json.load(f)
 
 server_return = requests.post(url, json=data)
-print(server_return[1])
+print(server_return["webcam.jpg"])
 jpg_original = base64.b64decode(server_return["undetected_item"])
 jpg_as_np = np.frombuffer(jpg_original, dtype=np.uint8)
 
