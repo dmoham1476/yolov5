@@ -7,7 +7,6 @@ import torch
 import torch.backends.cudnn as cudnn
 from numpy import random
 
-import pyrealsense2 as rs
 import numpy as np
 import sys
 
