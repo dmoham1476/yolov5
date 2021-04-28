@@ -191,6 +191,8 @@ def detect(save_img=False):
             #bg_removed = np.where((depth_image_3d > clipping_distance) | (depth_image_3d <= 0), grey_color, im0)
             bg_removed = np.where((depth_image_3d > clipping_distance) | (depth_image_3d <= 0), grey_color, covered_img)
 
+            print("testing.........", type(bg_removed))
+            return jsonfiy(bg_removed)
             #cv2.namedWindow("covered_img", cv2.WINDOW_NORMAL)
             #cv2.imshow("covered_img", covered_img)
             #cv2.namedWindow('RealSense', cv2.WINDOW_NORMAL)
