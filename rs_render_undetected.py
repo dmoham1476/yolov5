@@ -133,6 +133,9 @@ def detect(save_img=False):
         if classify:
             pred = apply_classifier(pred, modelc, img, im0s)
 
+        # Results json
+        results[path] = {}
+
         grey_color = 153
         # Process detections
         for i, det in enumerate(pred):  # detections per image
@@ -160,7 +163,7 @@ def detect(save_img=False):
                 for c in det[:, -1].unique():
                     n = (det[:, -1] == c).sum()  # detections per class
                     s += f'{n} {names[int(c)]}s, '  # add to string
-
+                    results[path][names[int(c)]] = n.item()
 
                 for *xyxy, conf, cls in reversed(det):
                     """
@@ -192,7 +195,10 @@ def detect(save_img=False):
             bg_removed = np.where((depth_image_3d > clipping_distance) | (depth_image_3d <= 0), grey_color, covered_img)
 
             print("testing.........", type(bg_removed))
-            return jsonify(bg_removed)
+            print(results)
+            string = base64.b64encode(cv2.imencode('.jpg', bg_removed)[1]).decode()
+            results["undetected_item"] = string
+            return jsonify(results)
             #cv2.namedWindow("covered_img", cv2.WINDOW_NORMAL)
             #cv2.imshow("covered_img", covered_img)
             #cv2.namedWindow('RealSense', cv2.WINDOW_NORMAL)
