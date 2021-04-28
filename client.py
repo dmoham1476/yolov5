@@ -3,6 +3,7 @@ import json
 import cv2
 import os
 import base64
+import numpy as np
 
 json_file = 'api_data.json'
 url = 'http://localhost:6000/detect'
