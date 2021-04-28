@@ -10,4 +10,4 @@ with open(json_file) as f:
     data = json.load(f)
 
 server_return = requests.post(url, json=data)
-print(server_return.text)
+print(server_return)
