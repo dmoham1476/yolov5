@@ -21,6 +21,12 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
+weights = 'yolov5s.pt' if len(sys.argv) == 1 else sys.argv[1]
+device_number = '' if len(sys.argv) <=2  else sys.argv[2]
+device = select_device(device_number)
+
+model = attempt_load(weights, map_location=device)  # load FP32 model
+
 @app.route('/detect', methods=['GET', 'POST'])
 
 def detect(save_img=False):
