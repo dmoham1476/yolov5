@@ -292,7 +292,7 @@ class LoadRS:  # for inference
         depth_frame = np.asanyarray(depth_frame.get_data())
         color_frame = np.asanyarray(color_frame.get_data())
 
-        #cv2.imshow("color_frame",color_frame)
+        cv2.imshow("color_frame",color_frame)
         img0 = color_frame
 
         #img0 = np.moveaxis(color_frame,2,0)
