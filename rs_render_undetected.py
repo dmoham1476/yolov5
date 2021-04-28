@@ -200,11 +200,12 @@ def detect(save_img=False):
             print(results)
             string = base64.b64encode(cv2.imencode('.jpg', bg_removed)[1]).decode()
             results["undetected_item"] = string
-            return jsonify(results)
             cv2.namedWindow("covered_img", cv2.WINDOW_NORMAL)
             cv2.imshow("covered_img", covered_img)
             cv2.namedWindow('RealSense', cv2.WINDOW_NORMAL)
             cv2.imshow('RealSense', bg_removed)
+            return jsonify(results)
+
             """
             # Save results (image with detections)
             if save_img:
