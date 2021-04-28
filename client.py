@@ -10,8 +10,8 @@ with open(json_file) as f:
     data = json.load(f)
 #    print(data)
 
-#image_dir = '/home/deepa/work/yolov5/data/images'
-image_dir = '/Users/d0m028p/image_work/gulfstream_yolov5/data/images'
+image_dir = '/home/deepa/work/yolov5/data/images'
+#image_dir = '/Users/d0m028p/image_work/gulfstream_yolov5/data/images'
 img_list = []
 
 i = 1
@@ -37,7 +37,7 @@ server_return = requests.post(url, json=data)
 server_return = server_return.json()
 
 print(server_return["detected_items"])
-jpg_original = base64.b64decode(server_return["undetected_item"])
+jpg_original = base64.b64decode(server_return["undetected_items"])
 jpg_as_np = np.frombuffer(jpg_original, dtype=np.uint8)
 img0 = cv2.imdecode(jpg_as_np, flags=1)
 
