@@ -21,10 +21,12 @@ device = select_device(device_number)
 
 model = attempt_load(weights, map_location=device)  # load FP32 model
 
-def consolidate(results):
+def consolidate(results, rs_results):
     agg_list = []
     for cam, predict in results.items():
         agg_list.append(predict)
+
+    agg_list.append(rs_results["webcam.jpg"])
 
     union_results = defaultdict(set)
     #Aggregate all camera predictions
@@ -32,7 +34,9 @@ def consolidate(results):
        	for k,v in d.items():
             union_results[k].add(v)
     #Assuming no false positives, keep maximum of all counts detected by each camera for an item
-    max_dict = {label_to_itemId_map[k] : max(union_results[k]) for k in union_results}
+    max_dict = {}
+    max_dict["detected_items"] = {label_to_itemId_map[k] : max(union_results[k]) for k in union_results}
+    max_dict["undetected_items"] = rs_results["undetected_item"]
 
     return max_dict
 
@@ -189,7 +193,18 @@ def detect():
 
     print('Done. (%.3fs)' % (time.time() - t0))
 
-    return jsonify(consolidate(results))
+    import requests
+    import json
+
+    json_file = 'api_data_camera.json'
+    url = 'http://localhost:8000/detect'
+    with open(json_file) as f:
+        data = json.load(f)
+
+    rs_results = requests.post(url, json=data)
+    rs_results = rs_results.json()
+
+    return jsonify(consolidate(results, rs_results))
 
 
 if __name__ == '__main__':

@@ -187,9 +187,6 @@ def detect(save_img=False):
             # Print time (inference + NMS)
             #print(f'{s}Done. ({t2 - t1:.3f}s)')
 
-
-
-
             # Remove background with 1m away
             grey_color = 153
             depth_image_3d = np.dstack((depth_image,depth_image,depth_image)) #depth image is 1 channel, color is 3 channels
@@ -200,10 +197,10 @@ def detect(save_img=False):
             print(results)
             string = base64.b64encode(cv2.imencode('.jpg', bg_removed)[1]).decode()
             results["undetected_item"] = string
-            cv2.namedWindow("covered_img", cv2.WINDOW_NORMAL)
-            cv2.imshow("covered_img", covered_img)
-            cv2.namedWindow('RealSense', cv2.WINDOW_NORMAL)
-            cv2.imshow('RealSense', bg_removed)
+            #cv2.namedWindow("covered_img", cv2.WINDOW_NORMAL)
+            #cv2.imshow("covered_img", covered_img)
+            #cv2.namedWindow('RealSense', cv2.WINDOW_NORMAL)
+            #cv2.imshow('RealSense', bg_removed)
             return jsonify(results)
 
             """
