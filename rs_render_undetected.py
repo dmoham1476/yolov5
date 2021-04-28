@@ -178,9 +178,9 @@ def detect(save_img=False):
                         xywh = list(map(int,xywh))
                         #print("JAE: xywh", xywh)
                         covered_img = cover_detected_items(covered_img, xywh, grey_color)
-                        print(covered_img)
+                        #print(covered_img)
             # Print time (inference + NMS)
-            print(f'{s}Done. ({t2 - t1:.3f}s)')
+            #print(f'{s}Done. ({t2 - t1:.3f}s)')
 
 
 
