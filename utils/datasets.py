@@ -163,7 +163,7 @@ class LoadImages:  # for inference
         if self.count == self.nf:
             raise StopIteration
         path = self.files[self.count]
-        path2 = self.files_list[self.count] 
+        path2 = self.files_list[self.count]
         if self.video_flag[self.count]:
             # Read video
             self.mode = 'video'
@@ -210,6 +210,108 @@ class LoadImages:  # for inference
     def __len__(self):
         return self.nf  # number of files
 
+class LoadRS:  # for inference
+    def __init__(self, pipe='rs', img_size=640, stride=32):
+        self.img_size = img_size
+        self.stride = stride
+
+        """         if pipe.isnumeric():
+            pipe = eval(pipe)  # local camera
+        # pipe = 'rtsp://192.168.1.64/1'  # IP camera
+        # pipe = 'rtsp://username:password@192.168.1.64/1'  # IP camera with login
+        # pipe = 'http://wmccpinetop.axiscam.net/mjpg/video.mjpg'  # IP golf camera
+
+        self.pipe = pipe
+        self.cap = cv2.VideoCapture(pipe)  # video capture object
+        self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 3)  # set buffer size """
+
+        # Intialize realsense camera
+        # Configure depth and color streams
+        self.pipeline = rs.pipeline()
+        config = rs.config()
+
+        # Get device product line for setting a supporting resolution
+        pipeline_wrapper = rs.pipeline_wrapper(self.pipeline)
+        pipeline_profile = config.resolve(pipeline_wrapper)
+        device = pipeline_profile.get_device()
+        device_product_line = str(device.get_info(rs.camera_info.product_line))
+
+        config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
+        print("Jae: Product", device_product_line)
+        if device_product_line == 'L500':
+            config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 30)
+        else:
+            config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+
+        # Start streaming
+        profile = self.pipeline.start(config)
+
+        # Getting the depth sensor's depth scale (see rs-align example for explanation)
+        depth_sensor = profile.get_device().first_depth_sensor()
+        depth_scale = depth_sensor.get_depth_scale()
+        print("Depth Scale is: " , depth_scale)
+
+
+
+        # Create an align object
+        # rs.align allows us to perform alignment of depth frames to others frames
+        # The "align_to" is the stream type to which we plan to align depth frames.
+        align_to = rs.stream.color
+        self.align = rs.align(align_to)
+
+
+    def __iter__(self):
+        self.count = -1
+        return self
+
+    def __next__(self):
+        self.count += 1
+        if cv2.waitKey(1) == ord('q'):  # q to quit
+            #self.cap.release()
+            cv2.destroyAllWindows()
+            self.pipeline.stop()
+            raise StopIteration
+        while True:
+            # Read frame
+            # Get frameset of color and depth
+            frames = self.pipeline.wait_for_frames()
+
+            # Align the depth frame to color frame
+            aligned_frames = self.align.process(frames)
+
+            # Get aligned frames
+            depth_frame = aligned_frames.get_depth_frame() # aligned_depth_frame is a 640x480 depth image
+            color_frame = aligned_frames.get_color_frame()
+
+            # Validate that both frames are valid
+            if depth_frame or color_frame:
+                break
+
+        # Convert images to numpy arrays
+        depth_frame = np.asanyarray(depth_frame.get_data())
+        color_frame = np.asanyarray(color_frame.get_data())
+
+        #cv2.imshow("color_frame",color_frame)
+        img0 = color_frame
+
+        #img0 = np.moveaxis(color_frame,2,0)
+        #cv2.imshow("flipped_frame",img0)
+        #img_path = 'webcam.jpg'
+        print(f'webcam {self.count}: ', end='')
+
+        # Padded resize
+        img = letterbox(img0, self.img_size, stride=self.stride)[0]
+        # Stack
+        #img = np.stack(img, 0)
+
+        # Convert
+        img = img[:, :, ::-1].transpose(2,0,1)  # BGR to RGB, to 3x416x416
+        img = np.ascontiguousarray(img)
+
+        return img_path, img, img0, depth_frame
+
+    def __len__(self):
+        return 0
 
 class LoadWebcam:  # for inference
     def __init__(self, pipe='0', img_size=640, stride=32):
@@ -456,7 +558,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
                 gb += self.imgs[i].nbytes
                 pbar.desc = f'{prefix}Caching images ({gb / 1E9:.1f}GB)'
             pbar.close()
-            
+
     def cache_labels(self, path=Path('./labels.cache'), prefix=''):
         # Cache dataset labels, check images and read shapes
         x = {}  # dict
@@ -501,7 +603,7 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
             pbar.desc = f"{prefix}Scanning '{path.parent / path.stem}' images and labels... " \
                         f"{nf} found, {nm} missing, {ne} empty, {nc} corrupted"
         pbar.close()
-            
+
         if nf == 0:
             print(f'{prefix}WARNING: No labels found in {path}. See {help_url}')
 
