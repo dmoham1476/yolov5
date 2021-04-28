@@ -297,7 +297,7 @@ class LoadRS:  # for inference
 
         #img0 = np.moveaxis(color_frame,2,0)
         #cv2.imshow("flipped_frame",img0)
-        #img_path = 'webcam.jpg'
+        img_path = 'webcam.jpg'
         print(f'webcam {self.count}: ', end='')
 
         # Padded resize
