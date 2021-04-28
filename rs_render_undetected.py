@@ -1,6 +1,8 @@
 import argparse
 import time
 from pathlib import Path
+import base64
+
 
 import cv2
 import torch
