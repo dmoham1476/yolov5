@@ -19,12 +19,20 @@ from utils.torch_utils import select_device, load_classifier, time_synchronized
 
 from flask import Flask, request, jsonify
 
+def cover_detected_items(img, xywh, grey_color):
+    (x,y,w,h) = xywh
+    covered_img = img.copy()  #(shape h,w,c)
+    bbox = np.array([[[grey_color]*3]*w]*h)
+    #print("Jae - bbox", bbox.shape)
+    covered_img[y-round(h/2-0.1):y+round(h/2+0.1), x-round(w/2-0.1):x+round(w/2+0.1),:] = bbox
+
+    return covered_img
+
 app = Flask(__name__)
 
 weights = 'yolov5s.pt' if len(sys.argv) == 1 else sys.argv[1]
 device_number = '' if len(sys.argv) <=2  else sys.argv[2]
 device = select_device(device_number)
-
 model = attempt_load(weights, map_location=device)  # load FP32 model
 
 @app.route('/detect', methods=['GET', 'POST'])
@@ -211,14 +219,7 @@ def detect(save_img=False):
     print(type(bg_removed))
     print(f'Done. ({time.time() - t0:.3f}s)')
 
-def cover_detected_items(img, xywh, grey_color):
-    (x,y,w,h) = xywh
-    covered_img = img.copy()  #(shape h,w,c)
-    bbox = np.array([[[grey_color]*3]*w]*h)
-    #print("Jae - bbox", bbox.shape)
-    covered_img[y-round(h/2-0.1):y+round(h/2+0.1), x-round(w/2-0.1):x+round(w/2+0.1),:] = bbox
 
-    return covered_img
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port = 8000)
